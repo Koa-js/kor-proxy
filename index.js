@@ -1,38 +1,49 @@
 'use strict';
 
-const Promise = require('bluebird');
+const url = require('url');
+const http = require('http');
+const https = require('https');
 const send = require('neat-send');
 
-const processHeader = (func, add) => (inHeader) => {
+const processHeader = (fn, add) => (inHeader) => {
   if (add) Object.assign(inHeader, add);
-  if (func) return func(inHeader);
+  if (fn) return fn(inHeader);
   return inHeader;
 }
 
-const newAgent = () => (new http.Agent({
-  keepAlive: true,
-  keepAliveMsecs: 10 * 1000,
-  maxSockets: 2000,
-  maxFreeSockets: 256,
-}));
+const newAgent = (protocol) => {
+  return new(protocol === 'https:' ? https : http).Agent({
+    keepAlive: true,
+    keepAliveMsecs: 10 * 1000,
+    maxSockets: 2000,
+    maxFreeSockets: 256,
+  });
+}
 
 // config: https
 module.exports = function proxy(target, {
-  https,
   dealHeader,
   dealTimeout,
 }) {
   const proHeader = processHeader(dealHeader, target.headers);
-  if (!target.host) throw new Error('Target Must Have a host!')
-  if (!target.agent) target.agent = newAgent();
-  if (!target.port) target.port = https ? 443 : 80;
+  const options = {};
+  if (typeof target === 'string') {
+    Object.assign(options, url.parse(target));
+    options.agent = newAgent(options.protocol);
+  } else {
+    if (!target.host) throw new Error('Target Must Have a host!');
+    if (!target.agent) target.agent = newAgent(target.protocol);
+    Object.assign(options, target);
+  }
+  target = null;
+
   return async(ctx, next) => {
     try {
       const opts = Object.assign({
         path: ctx.req.url,
         method: ctx.method,
         headers: proHeader(ctx.headers),
-      }, target);
+      }, options);
       const cres = await send(opts, {
         body: ctx.req,
       })

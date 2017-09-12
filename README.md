@@ -16,7 +16,9 @@ const opts = {
   host: 'x.x.x.x',
   // port: 8080,
   // agent,
+  // rejectUnauthorized: support when use tls.a
 };
+// opts can also be url absolute path.
 proxyConfig = {
   dealHeader() {
     // selected, deal req.headers before proxy;
@@ -25,5 +27,5 @@ proxyConfig = {
     // if none, will throw ('proxy-timeout');
   },
 }
-app.get('/proxy', proxy());
+app.get('/proxy', proxy(opts, proxyConfig));
 ```
