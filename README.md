@@ -16,7 +16,7 @@ const opts = {
   host: 'x.x.x.x',
   // port: 8080,
   // agent,
-  // rejectUnauthorized: support when use tls.a
+  // rejectUnauthorized: support when use tls
 };
 // opts can also be url absolute path.
 proxyConfig = {
