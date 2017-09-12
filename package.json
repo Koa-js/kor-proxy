@@ -1,6 +1,6 @@
 {
   "name": "kor-proxy",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "promise proxy middleware for koa",
   "main": "index.js",
   "scripts": {

@@ -20,7 +20,9 @@ const newAgent = (protocol) => {
   });
 }
 
-// config: https
+// target to get three elements:
+// protocol, host, port
+// path default use ctx.req.url
 module.exports = function proxy(target, {
   dealHeader,
   dealTimeout,
@@ -39,11 +41,11 @@ module.exports = function proxy(target, {
 
   return async(ctx, next) => {
     try {
-      const opts = Object.assign({
+      const opts = Object.assign(options, {
         path: ctx.req.url,
         method: ctx.method,
         headers: proHeader(ctx.headers),
-      }, options);
+      });
       const cres = await send(opts, {
         body: ctx.req,
       })
