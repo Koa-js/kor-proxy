@@ -37,19 +37,19 @@ const parseTarget = (target) => {
 }
 
 // path default use ctx.req.url
-module.exports = function proxy(target, options, ext) {
+module.exports = function proxy(target = {}, options = {}, ext = {}) {
   if (typeof target === 'string') {
     Object.assign(options, parseTarget(target));
   } else {
     ext = options; // options -> ext
     options = target; // target -> options
   }
-  target = null; // just easy to get options four elements.
+  target = null; // target is use for get protocol, auth, host, port
   const {
     dealHeader,
     dealTimeout,
   } = ext;
-  const proHeader = processHeader(dealHeader, target.headers);
+  const proHeader = processHeader(dealHeader, options.headers);
   if (!options.host) throw new Error('Target Must Have a host!');
   if (!options.agent) options.agent = newAgent(options.protocol);
 
@@ -62,7 +62,7 @@ module.exports = function proxy(target, options, ext) {
       });
       const cres = await send(opts, {
         body: ctx.req,
-      })
+      });
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true
       ctx.body = cres;
