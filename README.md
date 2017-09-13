@@ -12,7 +12,7 @@ const Koa = require('neat-kor'); // router wrap for Koa
 const proxy = require('kor-proxy');
 const app = new Koa();
 
-const opts = {}; // the same as http(s).request 's options parameterÏ
+const opts = {}; // the same as http(s).request 's options parameter
 const ext = {
   dealHeader() {
     // selected, deal req.headers before proxy;
