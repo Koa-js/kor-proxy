@@ -20,24 +20,38 @@ const newAgent = (protocol) => {
   });
 }
 
-// target to get three elements:
-// protocol, host, port
+// protocol, auth, host, port getFrom `target`
+const parseTarget = (target) => {
+  const {
+    protocol,
+    auth,
+    host,
+    port
+  } = url.parse(target);
+  return {
+    protocol,
+    auth,
+    host,
+    port
+  };
+}
+
 // path default use ctx.req.url
-module.exports = function proxy(target, {
-  dealHeader,
-  dealTimeout,
-}) {
-  const proHeader = processHeader(dealHeader, target.headers);
-  const options = {};
+module.exports = function proxy(target = {}, options = {}, ext = {}) {
   if (typeof target === 'string') {
-    Object.assign(options, url.parse(target));
-    options.agent = newAgent(options.protocol);
+    Object.assign(options, parseTarget(target));
   } else {
-    if (!target.host) throw new Error('Target Must Have a host!');
-    if (!target.agent) target.agent = newAgent(target.protocol);
-    Object.assign(options, target);
+    ext = options; // options -> ext
+    options = target; // target -> options
   }
-  target = null;
+  target = null; // target is use for get protocol, auth, host, port
+  const {
+    dealHeader,
+    dealTimeout,
+  } = ext;
+  const proHeader = processHeader(dealHeader, options.headers);
+  if (!options.host) throw new Error('Target Must Have a host!');
+  if (!options.agent) options.agent = newAgent(options.protocol);
 
   return async(ctx, next) => {
     try {
@@ -48,7 +62,7 @@ module.exports = function proxy(target, {
       });
       const cres = await send(opts, {
         body: ctx.req,
-      })
+      });
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true
       ctx.body = cres;
