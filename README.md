@@ -12,14 +12,8 @@ const Koa = require('neat-kor'); // router wrap for Koa
 const proxy = require('kor-proxy');
 const app = new Koa();
 
-const opts = {
-  host: 'x.x.x.x',
-  // port: 8080,
-  // agent,
-  // rejectUnauthorized: support when use tls
-};
-// opts can also be url absolute path.
-proxyConfig = {
+const opts = {}; // the same as http(s).request 's options parameterÏ
+const ext = {
   dealHeader() {
     // selected, deal req.headers before proxy;
   },
@@ -27,5 +21,6 @@ proxyConfig = {
     // if none, will throw ('proxy-timeout');
   },
 }
-app.get('/proxy', proxy(opts, proxyConfig));
+
+app.get('/proxy', proxy('https://auth:pwd@test.url.com:8080', opts, ext));
 ```
