@@ -46,6 +46,7 @@ module.exports = function proxy(target = {}, options = {}, ext = {}) {
   }
   target = null; // target is use for get protocol, auth, host, port
   const {
+    timeout,
     dealHeader,
     dealTimeout,
   } = ext;
@@ -62,16 +63,18 @@ module.exports = function proxy(target = {}, options = {}, ext = {}) {
       });
       const cres = await send(opts, {
         body: ctx.req,
+        timeout,
       });
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true
       ctx.body = cres;
       return;
     } catch (err) {
-      if (err.message === 'request-timeout' && dealTimeout) {
-        return dealTimeout(ctx, next);
+      if (err.message === 'request-timeout') {
+        if (dealTimeout) return dealTimeout(ctx, next);
+        err.message = 'proxy-timeout';
       }
-      ctx.throw('proxy-timeout');
+      ctx.throw(err.message);
     }
   }
 }
