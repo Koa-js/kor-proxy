@@ -20,24 +20,38 @@ const newAgent = (protocol) => {
   });
 }
 
-// target to get three elements:
-// protocol, host, port
+// protocol, auth, host, port getFrom `target`
+const parseTarget = (target) => {
+  const {
+    protocol,
+    auth,
+    host,
+    port
+  } = url.parse(target);
+  return {
+    protocol,
+    auth,
+    host,
+    port
+  };
+}
+
 // path default use ctx.req.url
-module.exports = function proxy(target, {
-  dealHeader,
-  dealTimeout,
-}) {
-  const proHeader = processHeader(dealHeader, target.headers);
-  const options = {};
+module.exports = function proxy(target, options, ext) {
   if (typeof target === 'string') {
-    Object.assign(options, url.parse(target));
-    options.agent = newAgent(options.protocol);
+    Object.assign(options, parseTarget(target));
   } else {
-    if (!target.host) throw new Error('Target Must Have a host!');
-    if (!target.agent) target.agent = newAgent(target.protocol);
-    Object.assign(options, target);
+    ext = options; // options -> ext
+    options = target; // target -> options
   }
-  target = null;
+  target = null; // just easy to get options four elements.
+  const {
+    dealHeader,
+    dealTimeout,
+  } = ext;
+  const proHeader = processHeader(dealHeader, target.headers);
+  if (!options.host) throw new Error('Target Must Have a host!');
+  if (!options.agent) options.agent = newAgent(options.protocol);
 
   return async(ctx, next) => {
     try {
