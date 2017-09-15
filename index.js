@@ -25,13 +25,13 @@ const parseTarget = (target) => {
   const {
     protocol,
     auth,
-    host,
+    hostname,
     port
   } = url.parse(target);
   return {
     protocol,
     auth,
-    host,
+    host: hostname,
     port
   };
 }
