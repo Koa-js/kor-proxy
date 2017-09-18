@@ -37,20 +37,16 @@ const parseTarget = (target) => {
 }
 
 // path default use ctx.req.url
-module.exports = function proxy(target = {}, options = {}, ext = {}) {
-  if (typeof target === 'string') {
-    Object.assign(options, parseTarget(target));
-  } else {
-    ext = options; // options -> ext
-    options = target; // target -> options
+module.exports = function proxy(options = {}, ext = {}) {
+  if (typeof options === 'string') {
+    options = parseTarget(options);
   }
-  target = null; // target is use for get protocol, auth, host, port
   const {
     timeout,
-    dealHeader,
+    headerRewrite,
     dealTimeout,
   } = ext;
-  const proHeader = processHeader(dealHeader, options.headers);
+  const proHeader = processHeader(headerRewrite, options.headers);
   if (!options.host) throw new Error('Target Must Have a host!');
   if (!options.agent) options.agent = newAgent(options.protocol);
 
