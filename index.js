@@ -3,7 +3,7 @@
 const url = require('url');
 const http = require('http');
 const https = require('https');
-const send = require('neat-send');
+const request = require('neat-request');
 
 const processHeader = (fn, add) => (inHeader) => {
   if (add) Object.assign(inHeader, add);
@@ -57,7 +57,7 @@ module.exports = function proxy(options = {}, ext = {}) {
         method: ctx.method,
         headers: proHeader(ctx.headers),
       });
-      const cres = await send(opts, {
+      const cres = await request(opts, {
         body: ctx.req,
         timeout,
       });
