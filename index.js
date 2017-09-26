@@ -45,21 +45,25 @@ module.exports = function proxy(options = {}, ext = {}) {
     timeout,
     headerRewrite,
     dealTimeout,
+    rr,
   } = ext;
   const proHeader = processHeader(headerRewrite, options.headers);
   if (!options.host) throw new Error('Target Must Have a host!');
   if (!options.agent) options.agent = newAgent(options.protocol);
+  const send = request.createClient(options, {
+    rr,
+    timeout,
+  });
 
   return async(ctx, next) => {
     try {
-      const opts = Object.assign(options, {
+      const opts = {
         path: ctx.req.url,
         method: ctx.method,
         headers: proHeader(ctx.headers),
-      });
-      const cres = await request(opts, {
+      };
+      const cres = await send(opts, {
         body: ctx.req,
-        timeout,
       });
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true
