@@ -48,7 +48,7 @@ module.exports = function proxy(options = {}, ext = {}) {
     rr,
   } = ext;
   const proHeader = processHeader(headerRewrite, options.headers);
-  if (!options.host) throw new Error('Target Must Have a host!');
+  if (!options.host || !rr || !rr[0] || !rr[0].host) throw new Error('Target/rr Must Have a host!');
   if (!options.agent) options.agent = newAgent(options.protocol);
   const send = request.createClient(options, {
     rr,
