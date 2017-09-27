@@ -1,6 +1,6 @@
 {
   "name": "kor-proxy",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "promise proxy middleware for koa",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/Koa-js/kor-proxy#readme",
   "dependencies": {
-    "neat-request": "^1.0.1"
+    "neat-request": "^1.0.2"
   }
 }
