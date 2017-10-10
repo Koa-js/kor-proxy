@@ -42,10 +42,12 @@ module.exports = function proxy(options = {}, ext = {}) {
     options = parseTarget(options);
   }
   const {
+    // send ext
+    rr,
     timeout,
+    // proxy handle
     headerRewrite,
     dealTimeout,
-    rr,
   } = ext;
   const proHeader = processHeader(headerRewrite, options.headers);
   if (!options.host && (!rr || !rr[0] || !rr[0].host)) throw new Error('Target/rr Must Have a host!');
