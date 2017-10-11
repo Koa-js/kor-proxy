@@ -3,7 +3,7 @@
 const url = require('url');
 const http = require('http');
 const https = require('https');
-const request = require('neat-request');
+const neat_http = require('neat-http');
 
 const processHeader = (fn, add) => (inHeader) => {
   if (add) Object.assign(inHeader, add);
@@ -48,11 +48,15 @@ module.exports = function proxy(options = {}, ext = {}) {
     // proxy handle
     headerRewrite,
     dealTimeout,
+    // client
+    client,
   } = ext;
   const proHeader = processHeader(headerRewrite, options.headers);
-  if (!options.host && (!rr || !rr[0] || !rr[0].host)) throw new Error('Target/rr Must Have a host!');
-  if (!options.agent) options.agent = newAgent(options.protocol);
-  const send = request.createClient(options, {
+  if (!client) {
+    if (!options.host && (!rr || !rr[0] || !rr[0].host)) throw new Error('Target/rr Must Have a host!');
+    if (!options.agent) options.agent = newAgent(options.protocol);
+  }
+  const send = client ? client.send : neat_http.createClient(options, {
     rr,
     timeout,
   });
@@ -65,7 +69,7 @@ module.exports = function proxy(options = {}, ext = {}) {
         headers: proHeader(ctx.headers),
       };
       const cres = await send(opts, {
-        body: ctx.req,
+        req: ctx.req,
       });
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true

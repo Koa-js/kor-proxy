@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/Koa-js/kor-proxy#readme",
   "dependencies": {
-    "neat-request": "^1.0.3"
+    "neat-http": "^0.0.2"
   }
 }

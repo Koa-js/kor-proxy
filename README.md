@@ -90,6 +90,7 @@ app.get('/proxy2', proxy(options, ext));
 - `ext.timeout` (num) - timeout(ms) between proxy request send and recieve response, defalut is 15s.
 - `ext.headerRewrite` (fn) - : deal headers before proxy, recieve one param, the raw `message.headers`.
 - `ext.dealTimeout` (fn) - : deal timeout error when proxy, if none will `ctx.throw('proxy-timeout')`.
+- `ext.client` (fn) - : custom client, can created by `neat-http`, which `kor-proxy` is based.
 
 
 ### Error Handle
