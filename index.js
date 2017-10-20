@@ -56,10 +56,12 @@ module.exports = function proxy(options = {}, ext = {}) {
     if (!options.host && (!rr || !rr[0] || !rr[0].host)) throw new Error('Target/rr Must Have a host!');
     if (!options.agent) options.agent = newAgent(options.protocol);
   }
-  const send = client ? client.send : neat_http.createClient(options, {
-    rr,
-    timeout,
-  });
+  const cs = client || {
+    send: neat_http.createRequest(options, {
+      rr,
+      timeout,
+    })
+  }
 
   return async(ctx, next) => {
     try {
@@ -68,7 +70,7 @@ module.exports = function proxy(options = {}, ext = {}) {
         method: ctx.method,
         headers: proHeader(ctx.headers),
       };
-      const cres = await send(opts, {
+      const cres = await cs.send(opts, {
         req: ctx.req,
       });
       ctx.res.writeHead(cres.statusCode, cres.headers);
