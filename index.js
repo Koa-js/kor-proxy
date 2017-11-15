@@ -5,12 +5,6 @@ const http = require("http");
 const https = require("https");
 const neat_http = require("neat-http");
 
-const processHeader = (fn, add) => inHeader => {
-  if (add) Object.assign(inHeader, add);
-  if (fn) return fn(inHeader);
-  return inHeader;
-};
-
 const newAgent = protocol => {
   return new (protocol === "https:" ? https : http).Agent({
     keepAlive: true,
@@ -41,12 +35,12 @@ module.exports = function proxy(options = {}, ext = {}) {
     rr,
     timeout,
     // proxy handle
-    headerRewrite,
+    preCtx,
+    postRes,
     dealTimeout,
     // client
     client
   } = ext;
-  const proHeader = processHeader(headerRewrite, options.headers);
   if (!client) {
     if (!options.host && (!rr || !rr[0] || !rr[0].host))
       throw new Error("Target/rr Must Have a host!");
@@ -61,14 +55,18 @@ module.exports = function proxy(options = {}, ext = {}) {
 
   return async (ctx, next) => {
     try {
+      if (preCtx) preCtx(ctx);
       const opts = {
         path: ctx.req.url,
         method: ctx.method,
-        headers: proHeader(ctx.headers)
+        headers: options.headers
+          ? Object.assign(ctx.headers, ctx.headers)
+          : ctx.headers
       };
       const cres = await cs.send(opts, {
         req: ctx.req
       });
+      if (postRes) postRes(cres);
       ctx.res.writeHead(cres.statusCode, cres.headers);
       // undefined == null, is true
       ctx.body = cres;

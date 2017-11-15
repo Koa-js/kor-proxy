@@ -88,7 +88,7 @@ app.get('/proxy2', proxy(options, ext));
 - `ext.rr` (Array) - : Default is `undefined`.Every element of arr will merge into `options`, in a round-robin manner. especially when need **Load-Balance**. (If `rr`'s element have same key with `options`, it will not merge into, please put common key in options, dynamic for **Load-Banlance** put in `rr` )
 - `ext.timeout` (num) - Defalut is `15s`, timeout(ms) between proxy request send and recieve response.
 - `ext.preCtx` (fn(ctx)) - : Default is `undefined`, normally used for prepare request before proxy to target, eg: `headerRewrite`, `pathRewite`.
-- `ext.postCtx` (fn(ctx)) - : Default is `undefined`, normally used for post deal response before back.
+- `ext.postRes` (fn(rawRes)) - : Default is `undefined`, normally used for post deal response before back.
 - `ext.dealTimeout` (fn) - : Default is `undefined`, deal timeout error when proxy, if none will `ctx.throw('proxy-timeout')`.
 - `ext.client` (fn) - : Default is `undefined`, Custom client, can created by `neat-http`, which `kor-proxy` is based.This method is set, `ext.rr` will be ignore(Because the client may be have `rr` configuration).
 
